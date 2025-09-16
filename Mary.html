@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para o Meu Amor ❤️</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* PLAYER CUSTOM */
+    .player {
+      display: flex;
+      align-items: center;
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .cover {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      margin-right: 10px;
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+
+    .info {
+      flex: 1;
+      text-align: left;
+    }
+
+    .title {
+      font-size: 0.95em;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .artist {
+      font-size: 0.8em;
+      color: #bbb;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+    }
+
+    .play-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #fff;
+      color: #121212;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      border: none;
+      outline: none;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 5px;
+      background: #333;
+      border-radius: 3px;
+      margin: 8px 0;
+      position: relative;
+    }
+
+    .progress {
+      height: 5px;
+      background: #1db954;
+      width: 0%;
+      border-radius: 3px;
+    }
+
+    .time {
+      font-size: 0.7em;
+      color: #aaa;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Foto */
+    img.love-photo {
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      margin: 20px 0;
+    }
+
+    h2 {
+      margin-top: 10px;
+      font-size: 1.5em;
+    }
+
+    /* Timer com degradê */
+    #timer {
+      margin: 15px 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: bold;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      background-image: linear-gradient(90deg, #ff4d6d, #c471ed, #12c2e9);
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      margin: 15px 0;
+      line-height: 1.6;
+      font-size: 1em;
+    }
+
+    /* Corações caindo */
+    .heart {
+      position: fixed;
+      top: -10px;
+      color: red;
+      font-size: 24px;
+      animation: fall linear forwards;
+      z-index: 9999;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <!-- PLAYER -->
+    <div class="player">
+      <img src="https://i.ytimg.com/vi/vBy7FaapGRo/hqdefault.jpg" class="cover" alt="Capa">
+      <div class="info">
+        <div class="title">Daniel Caesar - Best Part</div>
+        <div class="artist">HER Music VEVO</div>
+        <div class="progress-container">
+          <div class="progress" id="progress"></div>
+        </div>
+        <div class="time">
+          <span id="current">0:00</span>
+          <span id="duration">3:31</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="play-btn" id="play">&#9654;</button>
+      </div>
+    </div>
+
+    <!-- Áudio escondido -->
+    <audio id="audio" preload="metadata">
+      <source src="./audio/videoplayback.m4a" type="audio/mpeg">
+    </audio>
+
+    <!-- Foto -->
+    <img src="./fotos/mary.jpg" alt="Minha amada" class="love-photo">
+
+    <!-- Contador -->
+    <h2>Eu te amo há</h2>
+    <div id="timer"></div>
+
+    <!-- Texto -->
+    <p>
+      Mesmo diante de todos os problemas, meu amor por você nunca mudou. 
+      Você é e sempre será a garota que mais amo nesse mundo. Minha pequena &lt;3
+    </p>
+  </main>
+
+  <script>
+    // PLAYER SCRIPT
+    const audio = document.getElementById("audio");
+    const playBtn = document.getElementById("play");
+    const progress = document.getElementById("progress");
+    const current = document.getElementById("current");
+    const duration = document.getElementById("duration");
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    playBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playBtn.innerHTML = "❚❚";
+      } else {
+        audio.pause();
+        playBtn.innerHTML = "▶";
+      }
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = percent + "%";
+      current.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      duration.textContent = formatTime(audio.duration);
+    });
+
+    // CONTADOR
+    function atualizarTempo() {
+      const inicio = new Date("2018-02-28T00:00:00");
+      const agora = new Date();
+      const diff = agora - inicio;
+
+      let segundos = Math.floor(diff / 1000);
+      let minutos = Math.floor(segundos / 60);
+      let horas = Math.floor(minutos / 60);
+      let dias = Math.floor(horas / 24);
+      let anos = Math.floor(dias / 365);
+      let meses = Math.floor((dias % 365) / 30);
+      dias = dias % 30;
+      horas %= 24;
+      minutos %= 60;
+      segundos %= 60;
+
+      document.getElementById("timer").innerHTML =
+        `${anos} anos, ${meses} meses, ${dias} dias, ${horas} horas, ${minutos} minutos e ${segundos} segundos`;
+    }
+
+    setInterval(atualizarTempo, 1000);
+    atualizarTempo();
+
+    // CORAÇÕES
+    function criarCoracao() {
+      const coracao = document.createElement("div");
+      coracao.classList.add("heart");
+      coracao.innerHTML = "❤️";
+      coracao.style.left = Math.random() * 100 + "vw";
+      coracao.style.animationDuration = (Math.random() * 3 + 2) + "s";
+      document.body.appendChild(coracao);
+
+      setTimeout(() => {
+        coracao.remove();
+      }, 5000);
+    }
+
+    setInterval(criarCoracao, 500);
+  </script>
+</body>
+</html>
